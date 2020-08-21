@@ -3,10 +3,10 @@ A MapTool Drop in Monster Generation System for 5th Edition (5e) D&D
 
 *NOTE: This system is only intended to support 5th Edition.  While there are definately ways to make this support different
 systems (specifically other D&D Based Systems like 4th Edition or Pathfinder 1e/2e, the data JSON is all in a VERY specific
-format built from 5th edition resources (namely 5eAPI and 5eTools which we'll get into later), so to generate 4th or 3.5 or
-patfhinder monsters you would need to format the resources very specifically.  While the 5eAPI and 5eTools JSON formats are 
-fairly standard enough that it's possible, it is WELL outside the socpe of this document or my support of this product to 
-try to get it working with anything NOT coming explicitly from 5eAPI or 5eTools.
+format built from 5th edition resources, so to generate 4th or 3.5 or patfhinder monsters you would need to format the 
+resources very specifically.  While the 5eAPI and 5eTools JSON formats are fairly standard enough that it's possible, it is 
+WELL outside the socpe of this document or my support of this product to try to get it working with anything NOT coming 
+explicitly from 5eAPI or 5eTools.
 
 ----
 ## What is imcMonsterCreator
