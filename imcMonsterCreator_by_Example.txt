@@ -1,0 +1,621 @@
+------------------------------------
+Using imcMonsterCreator by Example
+------------------------------------
+This tutoral is intended to walk users of imcMonsterCreator through the appropriate use of the Framework by using the framework
+to complete a set of tasks.  For those who best learn by doing, this should get you at least 90% of the way there.
+
+The document assumes the user is using the imcMonsterCreator_Base campaign file to complete this tutorial.  No information is
+being provided for the setup or installation of imcMonsterCreator or the configuration of an existing campaign to use the tool.  
+For that information, please see the README file and any corresponding documentation.
+
+All tasks below assume the user has downloaded the most recent copy of the imcMonsterCreator distribution file and that their
+installation of MapTool meets the requirments in the "Requirements" section of the README.  Please unzip the distribution .zip
+file to a local directory before proceeding, and make sure you know where you've unzipped to and the basics of nagivating around
+your computer to get ahold of files.
+
+Initialization:
+==========================
+So to start with, lets walk through the campaign file to understand what it's doing and why it is as it is.
+
+First, a few basics:  We're going to assume that you are intending to use the best practice for using this MonsterCreator:  You
+will have a campaign file only intended for generating monsters.  That file will generate monsters which you will then export (once 
+generated and processed) into your Resource LIbrary so that you can use them in any campaign of your choosing later down the road.
+
+The library does support "JIT" (Just-in-time) creation of new monsters, but we'll see the limitations for that as we get farther
+into the tutorial.  For now, assume that this doucment will walk you through the process of creating, testing, and then exporting
+a generated token for later use.
+
+We'll start with the Library Map (Select Map -> Library).
+
+--- Library ---
+There are a few tokens on the map that provide functionality.  
+
+* The most important is the "Yin-Yang Dragon" red bordered token which is the actual Lib:MonsterCreator token providing the 
+monster geneartion and macro functionality for imcMonsterCreator.  This token is needed both in a campaign that is GENERATING 
+mosnters as well as in a campaign that is USING generated mosters.  Having access to this Library token to copy into your game 
+play map is useful.  This might be a good time to right-click/save the Lib:MonsterCreator to a place on your filesystem where 
+you have access to drag it into your gameplay campaigns.
+
+* The next token ot it's right is a basic "Dragon" token named "BasicMonster".  This token is used by IMC to generate new
+mosnters.  It's basic use is to be a token that has the MonsterBlock property set on it so that all new monsters will pick up
+the MonsterBlock properties instead of "base" or another set of properties on the campaign file.  It's name and the fact it
+is using "MonsterBlock" as it's properties set in it's config is the important part here.  This token is needed in any campaign
+that will be GENERATING monsters.  This token is not needed unless the capability to generate monsters is a requirement.
+
+* Below that are 3 icons for the issSpellStates Library.  THIS IS NOT A REQUIREMENT TO RUN IMC.  However, there are integrations
+so if issSpellStates is in your campaign along with imcMonsterCreator, some of the macros on a generated monster token will hook
+API calls within issSpellStates to do various things.
+
+* The Green/Red Check/X marks are only used as images for issSpellStates, they are definately NOT mandatory and do not need to be
+in the campaign unless using issSpellStates.  See the Documentation for issSpellStates for more information.
+
+--- Tokens ---
+The next map to look at is the "Tokens" Map (Select Map -> Tokens)
+
+Note the prevalence of a few monster tokens on this map.  
+This map holds images for Tokens.  These are the images that appear as the token itself in Maptool.
+
+The first image at the top is the "Generic" monster image.  This is the image that will be selected for a token image if there 
+is no explicit token image for the specific monster.  For instance if you look through the list you'll find there is no token 
+image for "Ogre".  If you were to generate an "Ogre" monster, it's token image would be the top image because there is no token 
+image explicitly named "Ogre".
+
+Parsing down through the list, we find we can create imaged tokens for monsters "Aboleth", "Adult Red Dragon", "Drow",
+"Ice Mephit", "Kobold", "Lich", "Orc", "Panther", and "Zombie"...some VERY CLASSIC AD&D/D&D Monsters!  These monsters also all
+happen to be in the 5eSRD and are thus free to use monsters in 5th Edition D&D. (Well, mostly...)
+
+The important thing to note is that images appearing here are TOKEN images and will be used for the TOKEN graphic for new monsters
+that are created.
+
+--- Portraits ---
+Next, lets look at the "Portraits Map" (Select Map -> Portraits)
+
+Again, there are some monster tokens on the map, but these have white backgrounds and are not nearly as "tokeny".  These images
+will be set as background/portrait images that are shown when mousing over the monster token.  Again, the icon at the top is the
+generic portrait icon which will be selected in the case where no image matches the mosnter we are creating.  
+
+Observant users will also note there are fewer portrait images than token images on the last map and that some of the portrait
+images are named differently than the token images.  We'll get through all of this as we start creating monsters.
+
+Again the important thing here is that portrait images named after monsters that we are creating will be picked up by the creator
+and used as the protrait for mosnters.  If a monster doesn't have a protrait, however, there's an easy way to set it later after
+generation.
+
+--- Player ---
+THe player map is where we'll be spending the vast majority of our time.  Of note, the Library, Portraits and Tokens maps are set 
+for GM only.  There is no ACTUAL reason you NEED a player map in your monster generation campaign...assuming you are following 
+best practice and keeping a campaign file used only to generate monsters.  However, for those wishing to use the JIT capability
+of the library, being able to generate a mosnter on your game play map instead of having to generate it on your library map and
+move it is a time saver.  We will be using the player map as a way to prove that the functionality of IMC works even when using
+it in a real campaign.
+
+
+------------------------------------
+Basic Features - Our First Monster
+------------------------------------
+So lets get into generation of our first monster to get a feel for what we're doing, how it works and what happens during the process.
+
+FIRST, however, lets go ahead and run a little utiltiy function on the LIbrary to ensure we have the proper properties set.  We'll
+talk about these properties, what they do, and why we might want to update them in the Advanced section of this tutorial.  For now
+we'll set the properties to some defaults and talk about the most important ones.
+
+Go back to your Library map (Select Map -> Library), click the Lib:MonsterCreator token, and scroll down to the bottom of the macros
+and click "setLibProperties".
+
+A box pops up asking for the default source for Monster Data.  For now, leave "5eAPI" selected.  Note that "Table" and "Lib:Token" 
+currently are not functional and may be removed in a future release (if you don't see them now, they are gone).  The User_Manual has
+a full discussion of the options here.  For now, leave "5eAPI" selected and click "ok".
+
+We're ready to generate our first Monster!
+
+BUT FIRST!
+
+--- PreRequisites ---
+
+We need to make sure things are good on your end.  
+
+See, IMC has the capability of going out to the Internet to grab 5th Edition Monster Data from a source known as the 5th Edition 
+Dungeons and Dragons API (https://www.dnd5eapi.co/).  This website maintains a formattted copy of data from the 5eSRD (The System 
+Reference Document published by WotC for 5th edition that contains a bunch of freely usable D&D 5e Information including something 
+like 750 monsters).  That formatted data is usable DIRECTLY by IMC to generate monsters from.  
+
+Unlike other sources, 5eAPI is web accessible and we can use the REST functionality within MapTool to Automatically obtain and process
+this data directly from the 5eAPI website without having to cut/copy/paste JSON data into the application.  Now, 5eAPI is runable 
+from your own home infrastucture to speed up access if you have the technical capability of doing so.  The benefit here is that it
+would be available to you even if you didn't have an internet connection at the time.  For those who objecft to REST based things on
+the grounds that they might not be available, this is a good middleground option.  See https://github.com/bagelbits/5e-srd-api.git 
+for more information on how to run your own copy of 5eAPI out of your own infrastructure.
+
+For now, however, we just need to make sure that your computer can hit / see the 5eAPI website.  Access the following two URLs from
+a web browser on the computer you're running MapTool From:
+
+https://www.dnd5eapi.co/
+https://www.dnd5eapi.co/api/monsters/adult-red-dragon
+
+If the first link gives you the front page to the 5th Edition Monster API homepage and the second gives you a bunch of weirdly
+formatted text information that looks like it might include some relevant information for a red dragon, you're ready to proceeed with 
+this tutorial!
+
+If either of the above did not work, it's time to start troubleshooting why.  Good Luck.  Come back once you've got both sites working.
+
+--- Generating our First Monster ---
+
+Ok, with all the prerequisites out of the way lets go back to the "Player" Map in your MapTool Campaign. (Select Map -> Player)
+
+* With your GM macros available, click "Create New Monster".  It'll be an olive button.
+* An Input box appears.  Type "Kobold" (Without the Quotes) into the first box (Replace the '0' that appears there by default).
+* Make sure "5eAPI" is selected in the Source of Monster Data and click the "OK" Button.
+
+A new token just appeared on your player map!  The token icon should look like a Kobold and mousing over the Kobold should show
+a white background Portrait Image for a Kobold (Ignore the Stat Block for a second, it'll be all kinds of dumpster fire right
+now).  The token should also have the name "Kobold" and should be selected/highlighted in Maptool.
+
+Note your chat text now says: "Kobold: [Kobold] Monster Token Created, Please Process."
+
+WHen you see this message you know the token is ready for the next step:  Parsing it's data into statistics and abilities.  But 
+for now, lets look at a couple things that will come up later.
+
+Right click the token, click "edit" and go to it's "properties" page.  If you scroll down to the bottom of the properties you'll
+see one named "jsonblock" which will start with "{" and contain a LOT of data after it.  This property stores all of the data for
+the monster.  All data pulled in from 5eAPI is stored here so that it can be re-read in the future.  This is important to know
+because it allows us to do 2 things:
+
+1) It allows us to reset a monster back to it's default state ANY TIME we choose...no matter how trashed the token is.
+2) Modifying the Stats on a Token creates a Homebrew copy of the token that will forever maintain those updated statistics.  We'll
+get into how we can homebrew a monster in the "Advanced" section of this tutorial...but the fact that the JSON data is saved 
+on the token itself allows us to persist each copy of the creature separately from it's original source.
+
+Note also the dataFromSource is set to a numeric identifier for 5eAPI.  Between the monster, it's original JSON and the indicator
+for how it was created, we always have a reference for how to generate or regenerate this monster any time it's used.
+
+--- Processing the Monster to Create Something Usable ---
+
+Ok, enough of that.  Go ahead and cancel the edit token window.
+
+* With the Kobold still selected/highlighted, click the olive "Process Monster" button.
+* For this partiuclar monster, it shouldn't take very long to get results (a second or three).
+
+NOTE: Some monsters (we'll see an example or two of this later) might take a somewhat significant amount of time to process
+through this step.  During this period MapTool will appear to "hang".  This is normal as there are hundreds of lines of macro
+code reading and processing data in many different ways.
+
+Hey!  Look at that!  NEW BUTTONS!
+
+If your "Selection" window is open, you should now see a bunch of new buttons appear for the selected token.  There are several
+sections of macro buttons that show up that we'll talk about in depth in a little bit, but for now, you should see Actions, 
+Special Abilities, Utilties and ZZZ-Destructive.
+
+Among other text in the Chat window, you'll see the following:  "Kobold: New Monster Token Parsed and Ready For Play."
+
+That's it!  The Kobold token is now a 5th Edition standard monster with all the stats and abilties, attacks and specials that
+you'll find in the stat block in the Monster Manual or 5e SRD.  Its very much that easy.
+
+--- Fixing Problems ---
+
+There are two INCREDIBLY important things to remember througout the rest of this tutorial.
+
+1) There is NO POSSIBLE WAY you can damage this token other than deleting it.  Three is nothing you can do to this thing that 
+we can't fix through a macro button you have access to.
+2) The exception to this are the 3 RED BUTTONS under the ZZZ-Destructive heading.  DO NOT press those till we get to that point
+in the tutorial.
+
+(Let me guess, because I made them red and told you NOT to press them, you pressed them, didn't you? :)  It's ok, lets fix
+this...)
+
+Lets pretend, for a second, that there are problems with your token or that you've done something during the tutoral to a token
+we're working with that has mucked something up.  Pressing the Red "Reset Monster to New..." button will ALWAYS reset the token
+back to the state it's in right now.
+
+Don't beleve me?  Select a macro on the Kobold by right clicking it and deleting it.  Of course, if you decide to select the
+"Reset Monster to New..." Macro to delete you're now just being obstinate...I wash my hands of you...:)
+
+Assuming you didn't delete the "Reset Monster to New..." macro to delete, you can do whatever else you want with the token.
+
+Once you're done mucking with it, click the "Reset Monster to New..." button.  It will take a second or two to re-process the 
+monster from it's base data and reset the token back to its original working state.  Keep this one in mind as we proceed in 
+case something does manage to go wrong.
+
+--- Exploring our New Monster ---
+
+Ok, so we have a Kobold on the field.  First thing to note is that the token resized itself when it was processed.  You may not
+have noticed, but the original token was "Medium" sized, however a kobold (by definition) is a size "S" (Small) creature and
+so processing it set it's size properly.  All mosnter tokens created will resize themsleves to their appropriate size based 
+upon their monster data once processed.
+
+** STATISTICS **
+
+Ok, so we have the kobold selected, lets look at it's stats.  Mouse over the Kobold and you'll be able to see it's stat sheet.
+AC, HP, Str/Dex/etc. stats, and everything else are as the 5e SRD says they should be.  HP are base average as per the monster's
+stat block and everything else is set properly.  To get a better view of this monster's stats, lets see it's actual stat
+sheet by clicking the black "Open Stat Sheet" button under "Utilities".
+
+A dialog window (HTML5) will pop up showing a representation of a fairly standard D&D 5e Monster Stat block from something like
+the Monster Manual.  All of it's capabilities should be here.  The stat sheet is important because it is generated off of the
+PROCESSED base data.  In other words, if you home brew'ed this kobold to have a 14 AC, you'd see AC 14 in it's stat sheet, while
+on another copy of the Kobold you didn't modify, it would show an AC of 12 (it's base default AC).  
+
+Go ahead and close th stat sheet, with the "Close" button at the bottom.
+
+** ABILITIES AND ATTACKS **
+
+Now, lets talk abilities and attacks.
+
+Click the "Pack Tactics" button.
+
+You will note that it prints the details of Pack Tactics to your chat window.  This print is ONLY going to you, the person
+clicking the buttons.  This is a common theme and a design concept for imcMonsterCreator, all output from the mosnter is going
+to you, the GM, not to your players.  This way, you can reference the text on any ability on the token without displaying that
+ability to your players.
+
+Ok, Pack Tactics and Sunlight Sensitivity aren't very intersting buttons.  They display the ability and what it means but they
+don't really DO anything.
+
+Lets try "Dagger".
+
+Note that pressing the "Dagger" button created some output in the chat window.  Again this is going ONLY to the person who
+clicked the button (the GM/DM).  The first line is the standard attack information you get out of a stat block.  The next lines
+are the Attack Roll and Damage roll of the attack.  
+
+Are you a DM who still likes to roll his or her own dice?  There you go.  All the information you need for determining to hit and
+damage are right there.  Roll away and be happy.
+
+OR, you can do away with your dice and have Maptool make the rolls for you.  Notice that the 1d20+4 and the 1d4+2 are Hyperlniked
+like on any normal webpage.  These are macros that will automatically roll those dice for you.  Feel free to click the 1d20+4.
+
+** TO HIT AND DAMAGE **
+
+A standardized box pops up with roll information.  The black number is the base roll that was made, as well as next to it you'll
+notice in much smaller print ADV and DIS which are the rolls made with Advantage and Disadvantage, so any time an attack roll is
+made, there are 2 dice rolls, one which is the first roll and will be printed in black and the second will be used to calculate 
+what the attack would look like with Advantage or Disadvantage).  Now, mouse over the black number to see both the formula
+(1d20+4) AND the actual dice that were rolled...in my case the mouse over shows "1d20+4 : [13, 11]"  If you look at the formula 
+everything here makes sense, the first roll I rolled on the D20 was a 13, the second roll was an 11.  With +4 to my attack, that 
+means a 17 for the first roll and a 15 for the second.  With Advantage (take the highest of the rolls) I rolled a 17, with
+disadvantage (the lowest of the rolls) I rolled a a15. It works!
+
+Now do the same with the 1d4+2 damage.  Click the link.
+
+Note the same basic box pops up, whlie the Attack was in Red, the Damage is in an orange box.  Note that the attack information
+appeared on the left side of the box while the damage number is appearing on the right.  We'll see in a second that all output
+within these generated monsters have been normalized in this way.  Attack or D20 rolls will ALWAYS appear on the right, Advantage
+and Disadvantage information will always appear in the middle, and Damage information will always appear on the right. 
+
+In this case of the damage there are 2 numbers the number in black is "standard" damage, the number in Red (in Parentheseis) is
+Critical Damage.  For now, critical is calculated as "Dice Roll 1" + "Dice Roll 2" + "Additional Damage", as per the basic D&D 5e
+critical methodology as defined in the players handbook.  Also know that this is changable, which we'll get into in the Advanced
+section of the tutorial later.
+
+Mouse over the Black damage text and you'll again see the formula and the dice roll pop up: in my case this was "1d4+2 : [3]".
+Mouse over the Red Critical Damage and you'll see it too has a pop up for it's formula which reads "1d4+1d4+2 : [3,3]"  For now, 
+it's important to note that the first rolled die in critical and the roll in normal damage will ALWAYS be the same.  That's because
+we do NOT make different rolls for non-crit and critical damage.  The non-critical damage is always used to calculate the critical
+damage.  More on how this works in the advanced section.
+
+Finally, go back and click the "Combined Attack/Damage Roll" link:  As you can see, the box now includes BOTH attack AND damage 
+information.  Everything however still works as explained above, the right text is mouse over capable and the rolls that generated
+that output are shown.
+
+Click the link again.  Note that a new box displays with different dice rolls in it.  This shows that maptool is actually rolling
+each time this hyperlink is clicked.
+
+** MORE THAN ONE SOURCE OF DAMAGE **
+Some monsters, like a Red Dragon, have attacks that hit with multiple types of damage, each of which is rolled separately.  So it's
+claw attack does some amount of physical piercing damage and another amount of fire damage.  The text rolls will allow you to roll
+each of those damages and the attack individually, but the "Roll Attack/Damage" link will roll ALL attack and damage rolls TOGETHER.
+So for the Red Dragon's claw, it will roll the 1d20 for the attack and the 2d10 for the piercing damage and the 4d6 for the fire 
+damage and put ALL of that into the box.  The attack roll stays, but all of the damage is added together the formulas are added
+together and crit is all added together as well.
+
+So the output of a "Combined Attack/Damage" for a creature doing 1d20+5 to Hit, 1d12+3 Physical Damage and 2d6 Cold Damage would be
+the Attack on the left, showing the Formula 1d20+5 and the 2 dice rolls (one for base and one for adv/disadvantage).  The middle
+would show the advantage/disadvantage rolls, and the right would show a damage formula of 1d12+3+2d6 and 3 dice rolls [7,3,4] for
+the dice that were rolled.  The damage would be added up and shown in the black normal damage text.  Critical damage would also
+be calculated with a formula 1d12+1d12+3+2d6+2d6 and 6 dice rolls would be shown [7,9,3,4,1,6] where the 7 and 9 come from the 
+d12 rolls and the 3, 4, 1, 6 come from the d6 rolls.  Also note that the 7 is the same as the normal die roll and the 3/4 are
+also the same as the normal damage roll, while the 9, 1 and 6 came from the "Extra" dice for the critical.
+
+--- Exploring the Remainder of the Monster ---
+
+All monsters generated by IMC will have different buttons and macros on them depending on their defined D&D capabilities.  While a 
+Kobold has "dagger" and "sling" attacks, an Orc will have "Greataxe" and "Javelin" attacks while a Red Dragon will have "Claw", 
+"Bite", "Tail", and it's breath attack (among others).  Each generated monster will generate buttons specific to it's own atttacks
+and damage that will allow you to either roll your own dice or let maptool roll those dice for you, and those dice will always be
+output in the same concise and consoldiated format you've seen above.  Finally, as with all text in IMC, the To HIt and Damage
+rolls will ALWAYS go ONLY to the GM.
+
+But what about the rest of the stuff on the monster that looks the same monster to monster?
+
+The buttons under "Utility" are standard across all monsters generated by the tool.  Thees buttons always do the same things monster
+to monster, though they do take the monster's individual stats into account when they do the thing.  
+
+* We've already covered "Open Stat sheet".  But to recap, this will open the stat sheet for any monster with it's D&D 5e Stat
+block.
+
+* Roll Initiative:  This button provides a macro that will roll the monster's initiative.  Clicking that link will BOTH roll the
+monster's individual initative (taking it's initiative bonus into account) AND add that monster into the MapTool Initiative tracker
+at that initative.
+
+* Ability Checks:  This will print a table of 5th Edition abilities along wtih the monster's individual check values for each ability
+including it's specific bonuses.  For instance, for our Kobold, he has a +2 to Acrobatics but a -1 to Persuasion.  Clicking on the
++2 under the "Acrobatics" column will roll an acrobatics check for the kobold including his +2 bonus.  As with all D20 rolls, the
+table shows the D20 roll as well as the Advantage/disadvantage rolls with mouse over to show the formula used.  Clicking the "+-1"
+under Persuasion however shows the formula 1d20 + -1 and you'll note that the D20 roll is actually 1 less than rolled.  Negative 
+checks are supported also!
+
+* Stat/Save Check:  Like Ability checks above, this will print a table of Attributes (Strength, Dex, Con, etc.)  On the first line
+below the headers is the "CHECK" line.  This is what you use to make a straight stat check like an opposed strength check or a basic
+intelligence check.  The second row below the header is the Saving Throw check.  This is how to make a saving throw vs. the stat.
+So to make a strength check, you'd click the +-2 in the first row under "strength", to make a strength saving throw, you'd click
+the "+-2" in the second row under Strength.
+
+* Set Elevation:  This basic feature sets the elevation property of the token in case the monster flies.  That property has no baring
+other than as a tracker for the fact the moster is NOT on the ground.  The input box takes a number in feet (or whatever other "unit"
+your table is using to determine movement")
+
+* Roll Monster HP:  Some DMs prefer to roll HP for monsters instead of using the base average in the stat block.  For this case,
+clicking the "Roll Monster HP" button will roll dice based around the monster's Hit Dice and bonuses (as shown on it's stat block) and
+will generate a new HP Total for the mosnter.  It will then SET that HP total on the token, setting it's new Max HP and base HP to be
+the new rolled value.  This is one of the few macros that does not spit out a Link that then rolls the dice for you...this does the 
+rolls based off the monster's stats and sets the property all in one go.
+
+NOTE: On "+-X".  Unfortunately the underlying data for these monsters do not apply signs in the positive case, only negative.  Because
+of that, it is impossible to simply print "1d20-1" because there is no way of knowing (without checking for a - every time I process
+any kind of roll) whether the bonus is positive or negative.  Because of the rarity of negative bonuses I've chosen not to fix this.
+THIS IS NOT A BUG but an intentional design choice.  Please don't ask me to fix this.
+
+We will cover the ZZZ-Destructive buttons in the Advanced Section.
+
+----------------------------------
+Beyond our First Monster!
+----------------------------------
+Holy crap, that was a lot of exploration for a little Kobold.
+
+Ok, keep the Kobold or remove it, it matters not...we're going to walk through generating a couple additional monsters and see some
+other features of the Drop-In.
+
+Lets start by generating an Adult Red Dragon.  
+
+* Click "Create New Monster" and type "Adult Red Dragon" into the box.  Again, ensure 5eAPI is selected for source.
+* Click "Process Monster to process the Red Dragon.
+
+Ok, better stuff here to explore but the one thing I want to point out right now happens when you mouse over the token.  Note that while
+the token image is that of a Red Dragon, the portrait image is the DEFAULT image.  Not awesome...lets see what we can do about that.
+
+* With Adult Red Dragon highlighted, click "Set Portrait Image" (another Olive button on the GM pannel)
+
+Within a second or so a pop up input box should show up with a dropdown on it.  One of the images should be "Red Dragon".  Select that
+and hit OK.  Now Mouse back over the token:  It worked!  The red dragon portrait is now associated with the Adult Red Dragon token.  
+
+So what happened?  Well if you look at the portrait map, you'll note that there isn't a porrait for "Adult Red Dragon", only "Red
+Dragon", this generally happens when the portraits are general enough over a species...like for instance all types of red dragon look
+pretty similar, just bigger.  Because it's REALLY difficult to say "oh an Adult Red Dragon is a Red Dragon so look for a portrait of
+that name" Programmatically, we give you the option of changing the portrait image for the token to something on your portraits map.
+
+Note that this ONLY works for images on the Portraits Map.  Images on the Tokens map won't be found.  Not to worry!  If you have a 
+token for a creature and simply want to set the token image as the portrait image, just drag the token images to both the token and
+portrait maps.
+
+Ok, that solves that problem.  Lets look at a few things specific to the Red Dragon that weren't there for the Kobold.
+
+By the way, this is a great time to test the combined attack/damage rolls to see how they play out for multi-damage types (as noted
+above).  Click "Bite" on the Red Dragon.  Note how it has an attack, a piercing damage and a fire damage roll.  Click the "Combined
+Attack/Damage Roll" link to roll everything all at once.
+
+--- Roll Recharge Check ---
+
+Also note there is an additional button under the Utilties section called "Roll Recharge Check".  This macro "knows" what all of
+the various abilities on the monster are that require recharge rolls.  For instance, on a Red Dragon, that would be it's breath
+weapon while on an Ice Mephit that would be it's Frost Breath.  
+
+The recharge macro will pick up ALL of the recharge checks across ALL abilities that have a recharge on them and will make a 1d6
+roll against each check, showing the rolled dice for each check so the DM can determine at the beginning of the round what comes
+back for a creature all in one shot.  Remember that this button is UNIQUIE to creatures that have recharge abilities (it will not
+show up if a creature does not have an ability that has a chance to recharge), and is unique to the creature itself.  The Red 
+Dragon will show a 5 on a D6 recharge check for it's breath weapon while the Ice Mephit shows a 6 on a D6 for it's frost breath.
+
+--- Lair / Legendary Actions ---
+
+Note that the Adult Red Dragon has the concept of Legendary actions and those show up as buttons also.  Anything that doesn't show
+a multi-action cost costs one Legendary Action, and by general definition, legendary creatures have 3 legendary action points to
+spend during a combat turn.  As with other macros, some just print things to the chat text window (like "Detect") while others 
+perform some kind of Attack or Damage roll (such as WIng Attack).
+
+The last thing to touch on for this token is the "Lair Actions" and this is where we get into a major difference between the data 
+types.
+
+We'll discuss the two supported input data types (5eAPI and 5eTools) more in the Advanced section, but one MAJOR difference between
+the two types is how they handle Lair Actions.  The input data format for 5eAPI treats lair actions as another attack, printing a 
+laundry list of information to the chat window about what all lair actions are supported...note that no attacks, damages or other
+effects are linked.  In 5eAPI Lair Actions aren't treated as separate abilities and thus there's no way to caluclate attack/damage
+rolls for the effects.  Using 5eAPI data sources, creatures with Lair Actions will be somewhat difficult to appropriately use.
+
+It's actally better to use the "Monster Stat Sheet" window to display the Lair Actions in this case as those are at least laid out
+slightly better.
+
+Conversely, 5eTools handles Liar Actions as an entirely seperate block of capabilties on the monster and thus you get separate
+buttons with intformation, attack and damage rolls built in for each Lair action.  That said 5eTools is more difficult to import
+monsters from than 5eAPI simply because the JSON entry is "by hand" in a cut/copy/paste methodology while 5eAPI is a simple
+automatic lookup.
+
+Ok, next:  Lets look at another Block of Abilities and explore issSpellStates integration!
+
+==========================================
+Third Time makes you an Expert - The Lich
+==========================================
+This time, we're going to generate a Lich.  If you need steps, please see the tutorial parts above for help in generating.
+
+HOWEVER before you procss the monster, read this:
+
+Processing Times, the MapTool Stack and other technical problems:  The Lich is one of the most complicated monsters in D&D 5e 
+with regards to it's abilities and capabilities.  The code generates just under 50 unique macro buttons for the token and this
+takes a while.  Processing large/complicated monsters like the Lich can cause MapTool to hang for in the neighborhood of 10 - 20
+seconds or even longer.  This is EXPECTED and you shouldn't be concerned till you manage to count past 30 seconds...at that point
+you might be seeing some kind of uniquie problem...
+
+Also note that this project forced me to go from the standard 8M starting value for Thread Stack Size to 24M.  As noted by many 
+MapToolers, before modifying your thread stack size remember that MapTool uses a ***LOT*** of threads, and quadrupling the amount 
+of memory allocated to each individual thread can take up a LOT of memory on your computer.  My development "Wintendo" system 32G 
+of memory on it, so this 24M / Thread doesn't bother me in the least...your mileage definately may vary.  That said, if you are 
+processing monsters like the Lich and you get a stack overflow error, this might be the cause.
+
+Ok, warnings out of the way, lets go ahead and delve into the new section under the Lich.
+
+Lich's are spellcasters and as such have spells.  There is now a "spells" block on the Lich's token that helps "cast" spells
+for the Lich.
+
+First thing to point out, the title of the Spells Macro Group includes the number of spell slots of each level the Lich/Spellcaster
+has.  So in this case a Lich has 4 first level spells, 3 2nd - 5th level spells, and 1 6th - 9th level spells.  Below that, the
+spells a Lich has access to appear in a gradient of blue.  Each "level" of spells (0, 1, 2, etc.) moves to a slghtly darker shade
+to indicate the level change.  Each spell name is also marked with it's level in (), so "Mage Hand (0)" is a Cantrip while 
+Disintegrate (6) is a 6th level spell.
+
+Now, click any one of the spell buttons.  A new window pops up with the description of the spell.  This is an integration point 
+with the issSpellStates library.  Without this library installed, Clicking the button will simply print the text:
+
+Lich: Casts Lich casts Fireball! 
+Level: 18, DC: 20 (INT), sATK: +12
+
+NOTE: The Spellcaster level, Spell DC and Check Type, and Ranged Spell Attack Bonus (sATK) are printed for each spell.  
+
+However WITH Lib:issSpellStates installed and configured properly in the camapaign, the spells each link to their respective 
+spell descriptions which are searchable through the box that popped up.  Each spell will automatically open the Spell Search
+box to that spell's description, providing you all the information needed to appropriately manage the casting of that spell
+in your campaign.  
+
+The other creature to look at in this section is the "Drow", which doesn't have a spellcsting section but does have a special 
+"Spells: Innate Abilities" section which acts quite a bit like the spells section except instead of being controlled by spell slots, 
+they are either At Will Powers or X-Times / Day powers.
+
+==========================================
+All the Rest and Extending your Library
+==========================================
+The tutorial campaign comes with tokens for 9 different monsters and portraits for all but one.  Below are the "interesting"
+tokens to generate:
+
+* Aboleth - Legendary Action with an Attack and Damage Roll - Size Large to see how that affects the token.
+* Adult Red Dragon - Missing Portrait (Can be set with Set Portrait Image), recharge ability, lair actions.
+* Drow - Innate Spells
+* Panther - No portrait image at all.
+* Ice Mephit - Recharge Ability, Size Small
+* Kobold - Size Small to see how that affects the token.
+* Lich - Spell Caster, Legendary Actions, and one of the most complex monsters you can generate!
+* Orc - Nothing really new to see here...
+* Panther - No available portrait image, so uses "default".
+* Zombie - Who doesn't want to roll a bunch of zombies? :)
+
+Feel free to generate any / all of the below, export them (right click/save) and then drag them onto a test campaign to see
+how the monsters function live!  Remember that you WILL need Lib:MonsterCreator in any campaign you want to use these generated
+monsters on.  
+
+--- Extending your LIbrary of Monsters ---
+
+For those paying attention, you'll notice i've talked about two different formats for monster data in IMC.  The second data set
+also includes additional information/tools that can be used by IMC to extend your library of functionality here.  It's worth
+checking out.  Why am I being so cagy?  Go read the manual for more information.
+
+Keep in mind that 5eAPI contains over 700 monsters available for free/public use.  And while 5eAPI DOESN'T include icons/tokens
+or portraits, a vast plethora of free and low price artwork exists for tokens and portraits of creatures out there.  MapTool's 
+forums contain a multitude of resources in the User Contributions section that can help you get started.  Remember, if you don't
+have a real "portrait" image for the token, it's just as easy to put the token image into the Portraits map and let it use the 
+token image as both a token and a portrait image.
+
+Any tokens or images you have or create can be placed onto the maps and used for images for your creatures and worst case senario:
+Portraits and Images are NOT MANDATORY.  The Generic creature token is a perfectly viable method of building monsters...as a DM
+having a monster with all the correct stats and attacks and abilties in front of you on the battlefield FAR outweighs the
+inconvenience of not having a proper token image for the monster.  Don't hesitate to build monsters you need even if you don't
+have tokens for them.
+
+What creatures can you build?  Through 5eAPI, you can go to https://www.dnd5eapi.co/api/monsters/ to get a list of everything 
+5eAPI supports.  Remember that 5eAPI uses "-" between words and lower cases everything while IMC uses proper names for all of
+the creatures.  So to get "https://www.dnd5eapi.co/api/monsters/adult-red-dragon" built in IMC, you'll want to use "Adult Red
+Dragon" as the creature name.
+
+
+-----------------------------------
+Advanced Information
+-----------------------------------
+What's this?  Still not enough for you?  Ok, here's some advanced topics that I haven't included in the main walkthrough.  
+These will be a bit more "discussion" and less "click this, do this" but this should give you a feel for the rest of the
+functionality within IMC.
+
+--- Properites, what they are and when to change them. ---
+One of the base intentions for IMC was to separate monster properties into it's own block of properties so as not to interfear
+with existing player properties.  This allows the monster stat block (mouse over token stats) to show something DIFFERENT than
+the player stat blocks.  In MOST frameworks, if you as the DM want the players to see each other's ArmorClass (AC) but NOT the
+monster's AC, this is usually a problem.  With the monster tokens all being on a separate block of statistics from the player
+tokens, this is much more easily handled.  The AC Stat can now be shown for a player to the GM only, To it's owner or to all
+players without having to ALSO show the Monster's AC to GM Only, Token Owner or All Players. 
+
+NONE Of the token properties are intended to be modified by hand at any time.  Things like HP and TempHP are standardized
+so that they likely work with most frameworks (and if not a "modify creature HP" macro on the GM pannel would be appropriate),
+and any properties intended to be modified within the token generally have their own modification buttons (like Elevation).
+
+THAT SAID, modifying a token's properties isn't necessairly a bad thing.  It's just important to keep in mind what effects
+of IMC will remove your modifications.
+
+To start with, there are only 3 token properties that are intended to be 'Persistent' through a token reset:  
+* jsonblock
+* addjsonblock
+* dataFromSource
+
+You can see these at the BOTTOM of the token properties window with "MonsterBlock" selected.  ANY other token properties are 
+wiped clean and reset to default vaules when you reset a token.  Also, any changes you make to properties on the token affect
+ONLY that token (Yea, DUH I get it but just in case that wasn't obvious), so updating a token's properties doesn't modify
+other tokes of that type.
+
+So when would you want to do this?  If you are creating a one time one-off monster for use in your campaign in a single fight
+(like, for instance, you want a "boss" version of a common creature like an Orc), this might be the appropriate way to go 
+about creating that one-off creature.  However, if you ever click one of the Red "Reset" buttons, that creature is going to
+lose it's unique statistics.  
+
+**** NEVER NEVER NEVER NEVER Drop a token, modify it's properties, and then right-click / save the token to create a *****
+**** new monster. This will lead to nothing but madness and dispair.                                                 *****
+**** AND ESPECIALLY NEVER NEVER NEVER RIGHT CLICK/COPY YOUR UPDATED TOKEN A BUNCH OF TIMES!  If you want to create   *****
+**** duplicates of a modified creature, don't just modify properties and create duplicates...that way absolutely     *****
+**** will lead you to problems in the future.                                                                        *****
+	
+Continue down to "Homebrewing a Monster" section below for information on a way to create persistent homebrewed content WIHOUT
+pulling all your hair out and having to redo work a thousand times.
+
+Save yourself the heartache, and don't modify properties unless you are TRUELY creating a unique one off you will never use
+again, otherwise, check out the "homebrew" secton below.
+
+--- Modifying the Critical Damage Formula ---
+imcMonsterCreator includes the ability to homebrew the Critical damage formula.  While the D&D 5e players handbook states
+that the critical damage formula is to "double all dice" and then add bonus damage, it also suggests there are other ways
+of handling things (I believe it even references the potentially even more popular 2xDamage Rolled + Bonus instead of 
+rolling the damage dice twice).  
+
+Because there are about as many ways to roll critical damage as there are opinions in a room, i've included a rudimentary
+way of modifying the critical damage formula.  
+
+On the Library Token (Lib:MonsterCreator) is a property called "pCriticalFormula" which as you will see is currently set to:
+
+%{dice1}+%{dice2}+%{add}
+
+In short this is "damage dice" + "damage dice" + "additional damage", or...the base formula for 5e.  If, instead you wanted
+2x dice + add you'd change this formula to read:
+
+2*%{dice1}+add
+
+Which would give you 2 times the first set of dice rolled + additional damage.  If you like huge criticals and use another 
+common formula of 2x(all dice + bonus damage) you could use:
+
+2*(%{dice1}+%{add})
+
+In these formulas:
+
+* %{dice1} Is the first roll of ALL damage dice (so if a particular creature rolls 2d10 piercing damage and 4d6 fire damage
+	dice1 = 2d10+4d6).
+* %{dice2} is the second roll of ALL damage dice (Again for 2d10 + 4d6 it would be the second roll of 2d10 and 4d6 added
+	together).
+* %{add} is the Additional bonus damage applied to the attack from all sources.  So if the attack is 2d10+10, "10" damage
+	would be the add.
+
+These "formula" are in "strformat()" format in MapTool.  While I haven't tested anything too spectacular or complicated, 
+any formula that would properly "eval" should be able to be used in that property to create critical damage.
+
+
+-- Data Destruction/Reset Macros
+-- Homebrewing a monster.
+-- Input Data Types - 5eTools
