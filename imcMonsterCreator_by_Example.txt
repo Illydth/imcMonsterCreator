@@ -4,7 +4,7 @@ Using imcMonsterCreator by Example
 This tutoral is intended to walk users of imcMonsterCreator through the appropriate use of the Framework by using the framework
 to complete a set of tasks.  For those who best learn by doing, this should get you at least 90% of the way there.
 
-The document assumes the user is using the imcMonsterCreator_Base campaign file to complete this tutorial.  No information is
+The document assumes the user is using the imcMonsterCreator5e campaign file to complete this tutorial.  No information is
 being provided for the setup or installation of imcMonsterCreator or the configuration of an existing campaign to use the tool.  
 For that information, please see the README file and any corresponding documentation.
 
@@ -31,7 +31,7 @@ We'll start with the Library Map (Select Map -> Library).
 There are a few tokens on the map that provide functionality.  
 
 * The most important is the "Yin-Yang Dragon" red bordered token which is the actual Lib:MonsterCreator token providing the 
-monster geneartion and macro functionality for imcMonsterCreator.  This token is needed both in a campaign that is GENERATING 
+monster generation and macro functionality for imcMonsterCreator.  This token is needed both in a campaign that is GENERATING 
 mosnters as well as in a campaign that is USING generated mosters.  Having access to this Library token to copy into your game 
 play map is useful.  This might be a good time to right-click/save the Lib:MonsterCreator to a place on your filesystem where 
 you have access to drag it into your gameplay campaigns.
@@ -42,12 +42,18 @@ the MonsterBlock properties instead of "base" or another set of properties on th
 is using "MonsterBlock" as it's properties set in it's config is the important part here.  This token is needed in any campaign
 that will be GENERATING monsters.  This token is not needed unless the capability to generate monsters is a requirement.
 
+* The last token to it's right is a Gray "Blob" token named "LairActionEffects".  When rolling initiative for a token that has
+liar actions associated with it (it has macros in the "Lair Action" group) IMC will add a token onto the Initiative at init 20
+named "LairActionEffects".  This token is intended to help the DM remember to fire Lair Actions on initiative 20 as per the 
+rules of D&D5e.  This token has no other use than to act as a placeholder for Liar Actions.
+
 * Below that are 3 icons for the issSpellStates Library.  THIS IS NOT A REQUIREMENT TO RUN IMC.  However, there are integrations
 so if issSpellStates is in your campaign along with imcMonsterCreator, some of the macros on a generated monster token will hook
 API calls within issSpellStates to do various things.
 
 * The Green/Red Check/X marks are only used as images for issSpellStates, they are definately NOT mandatory and do not need to be
-in the campaign unless using issSpellStates.  See the Documentation for issSpellStates for more information.
+in the campaign unless using issSpellStates functionality.  See the Documentation for issSpellStates for more information.  If
+you are simply looking to hook monster spell lookups, you don't need these two icons.
 
 --- Tokens ---
 The next map to look at is the "Tokens" Map (Select Map -> Tokens)
@@ -507,7 +513,7 @@ Feel free to generate any / all of the below, export them (right click/save) and
 how the monsters function live!  Remember that you WILL need Lib:MonsterCreator in any campaign you want to use these generated
 monsters on.  
 
---- Extending your LIbrary of Monsters ---
+--- Extending your Library of Monsters ---
 
 For those paying attention, you'll notice i've talked about two different formats for monster data in IMC.  The second data set
 also includes additional information/tools that can be used by IMC to extend your library of functionality here.  It's worth
@@ -596,7 +602,7 @@ On the Library Token (Lib:MonsterCreator) is a property called "pCriticalFormula
 In short this is "damage dice" + "damage dice" + "additional damage", or...the base formula for 5e.  If, instead you wanted
 2x dice + add you'd change this formula to read:
 
-2*%{dice1}+add
+2*%{dice1}+%{add}
 
 Which would give you 2 times the first set of dice rolled + additional damage.  If you like huge criticals and use another 
 common formula of 2x(all dice + bonus damage) you could use:
@@ -616,6 +622,144 @@ These "formula" are in "strformat()" format in MapTool.  While I haven't tested 
 any formula that would properly "eval" should be able to be used in that property to create critical damage.
 
 
--- Data Destruction/Reset Macros
--- Homebrewing a monster.
--- Input Data Types - 5eTools
+-- Data Destruction/Reset Macros ---
+Under the macro section "ZZZ-Destructive" are 3 macros that you shouldn't need to use on a regular basis, but which might
+just come in handy periodically.  
+
+* Reset Monster to New...
+The first, and most useful, is "Reset Monster to New...".  While this macro is under the ZZZ-Destructive section the macro
+is generally not "destructive" assuming you don't have custom data applied to the token that isn't applied to the JSON
+itself.  This is why, above, I strongly encourage you NOT to directly modify properites or otherwise tweek tokens by 
+modifying anything but the JSON data under the covers.  The Reset macro basically cleans out the token and re-processes
+the JSON, re-creating all macros and stats new.
+
+This is a useful macro for resetting the mobs on your maps after combat.  If you use the same campaign for multiple groups 
+or otherwise need to reset a combat back to where it was before you started your session, this is the macro to do it.
+Simply select the token and click "Reset Monster to New..." and it will regenerate everything about the monster.  All stats,
+all macros, all calculated numbers are reset to their defaults.
+
+NOTE:  There is an interaction between the Reset Macro and the "Roll Monster HP" Macro.  Because using "Roll Monster HP"
+does not modify the underlying JSON data, running a Reset on the token will reset the monster's HP back to the average
+default, NOT the number last rolled with "Roll Monster HP", thus if you are a DM that does use monster HP Rolling instead
+of the default HP listed within the stat block, you will need to use the Roll Monster HP again after the reset to get new
+HP and that will NOT just give you the originally rolled HP, it will be a new roll.
+
+* [WARNING] Regenerate Token...
+The second macro, "[WARNING] Regenerate Token..." is more problematic from a data descruction perspective and should be used 
+with Caution, thus the "[WARNING]" marking on the button.  Unlike "Reset", this will blow way ALL Data on the token, INCLUDING 
+this JSON that makes up the monster.  Running this reset will require you to re-download the JSON data into the token.  
+You'll use this macro if you've modified JSON to try to create something special/homebrew and need to reset back to the 
+base JSON.  Usually, it's generally more useful to just drag another copy of the token to the board to fix JSON problems, 
+but there may be conditions where it's easier or better for your workflow to re-apply the base JSON than to use a new copy 
+of it.
+
+The OTHER (and more likely) reason to use "Regenerate Token..." is a data update for the token.  Data problems are not
+abnormal for both 5eAPI and 5eTools, and when data is updated for a monster, being able to replace that data with the updated
+data is important.  One of the benefits of imcMonsterCreator is the ability to correct for data mistakes, either by updating
+the JSON directly or by replacing the JSON with updated data from the source.
+
+* [WARNING] Edit JSON Data...
+And speaking of direct modification of the JSON data, the third macro under ZZZ-Destructive is "[WARNING] Edit JSON Data..."
+Again, with the "[WARNING]" designator, doing the wrong thing with this will destroy the data on the token.  Obviously if
+you do destroy data you can either regenerate the monster or use the "Regenerate Token..." macro to fix the problems.  Edit
+JSON, however, will pull up a form with all of the Monster base JSON data in the form.  Initially, when the form opens, the
+JSON will be unformatted.  Clicking the "Format JSON Data" will cause the monster JSON to be formatted in the Edit box. 
+
+Data edit is NOT Live and NOT automatically saved.  You can do anything you want in the box(s) and no edits will take place
+till you click the "Save" button at the bottom.  (NOTE: The first time you use this form you'll likely have to drag it to 
+expand it, the base form is too small to be useful).  If you make changes you don't like, you can click the "Cancel" button
+at the bottom to not save the changes.
+
+*** WARNING *** If you click the "Clear JSON Data" button and then click "save" you WILL remove/destroy all of the JSON
+data on the token.  Clearing the JSON in the box does clear the data on the property.  If you do this, you'll need to click
+the "Regenerate Token..." button or copy a new token onto the field to do much with it.
+
+
+-- Homebrewing a monster ---
+So lets talk about what it would take to homebrew a monster with this system. 
+
+Generally speaking, the system works best if you are starting with a base monster. D&D Has hundreds (maybe thousands) of 
+monsters, so finding one to create your homebrew off of probably isn't a terrible ask.  However, this isn't mandatory, it
+just makes the starting point easier.
+
+Regardless, figure out which format for data you want to use:  5eAPI or 5eTools, both JSON formats work, though 5eTools
+is a bit more robust of a format (given it's capability for using {@<type>} to define attacks, damage rolls, etc.).  Once 
+you have a format, load ANY monster into the system.  It's suggested that you load a monster with the types of attacks your 
+Homebrew monster has...having access to the JSON blocks for the same types of attacks as you'll be implementing will be 
+helpful.  For instance, if your Homebrew monster is a spellcaster with Lair Actions, you should consider loading up a monster 
+that has both spell casting and lair actions to start with.
+
+From there, modify the JSON to fit your needs.  If you don't start with a monster that has all of the same abilities as your
+homebrew, it's likely you'll want to find monsters wtih the same types of ability sources so you have access to the various
+JSON blocks to add to your system.
+
+So lets walk through an example.  Lets say we want to generate a "boss" version of a Vampire...one that could act as an
+antagnoist for your campaign, so it needs the abilty to do more than just the basic Vampire.  We decide we want to use the
+5eTools format for our Boss Vampire.  Looking at the Vampire stat block, it already has Legendary Resistance, Attacks, 
+and Legendary Actions, all really good things for a "Boss" to have.  There are also special abilities which is great also.
+However, lets say that we're looking for our boss vampire to also be able to cast spells, and we want it to have access to 
+Lair Actions as well.
+
+We start by creating a Vampire token.  Choose 5eTools and load the Vampire's JSON data into the token...process it.  Now
+we have our "base" Vampire...now we need to add spells and lair actions to our Vampire Token. 
+
+So for Spell Casting we know a Lich has access to spells.  We look up a Lich in 5eTools and find a "spellcasting" block.  
+We can take that block and insert it into the Vampire JSON at the right place.  With the Lich JSON data open in 5eTools, 
+in MapTool, click our Vampire Token and click the "Edit JSON Data..." button.  Open the form up to get access to the two
+blocks and click the "Format JSON Data" button  to format the JSON for editing.
+
+Copy the "Spellcasting" block from the Lich and insert it into the correct place in the Vampire's JSON data.  Obviously
+you may want to modify the spellcasting data for different spells or slots, so make the updates as needed.
+
+Ok, so now our Vampire has spells on top of it's general abilities.  Now for Lair Actions.  We know that Dragons have 
+lair actions, so we open "Adult Red Dragon" in 5eTools to get access to a Liar Action section.  We copy the info block as
+JSON and open it in another editor, copying out the Lair Actions section and copying that into the second box on the form.
+
+Finally, we save the data and click the "Reset Monster to New..." button to generate our new boss Vampire.  Export the
+token (Right Click on the token and click "Save") and save it to your Resource Library to save it permanently.
+
+NOTE:  "Regenerate Token..." will destroy this token.  It will delete your JSON data requiring you to go back through
+the above process to create it again.  At this point you need to do one of the following:  1) DON'T use the Regenreate 
+Token button, or (recommended) 2) Save the JSON data off somewhere where you can get to it again.
+
+
+--- Input Data Types - 5eAPI / 5eTools ---
+There are two supported formats for data in imcMonsterCreator:  The 5e SRD API and the 5eTools Project.  Both data sets
+are feature complete for their intended purpose and both have websites, GitHub Projects and Discord Channels for support
+should something go wrong with their projects.  I, personally, have contriubted to both projects with Data Fixes and
+reports of other minor problems, and you should do the same.
+
+The User Manual has more information on the two formats, however it is important to note that each project has it's own
+respective use case.  
+
+5e SRD API (known as 5eAPI in this document) is a web based REST API that returns data on the 5th Edition SRD...monsters, 
+classes, spells, etc.  IMC uses the REST API to retrieve data from the 5eAPI website directly without requiring data input
+by the end user.  This allows VERY QUICK creation of monsters from the SRD.  Also, tokens created from the SRD are 100% 
+free to do with as you please...export, distribute, modify, etc.  The SRD is intended to get players into 5e without having
+to buy books or other resources.  All information in the SRD is "Open Source" and freely usable...so tokens generated with 
+this data are also freely usable without worry about distributing or using data you're not legally allowed to use.
+
+5eTools is a more fully featured project.  It includes data from all sources of 5th Edition, both the data from the SRD AND
+data from the closed source manuals.  This makes 5eTools more problematic for use.  Even among SRD monsters (like an Adult
+Red Dragon), 5eTools provides MORE data than the SRD does, however that data, as NOT part of the SRD, is closed source data.
+Just because the monster is in the SRD doesn't mean all the information provided by 5eTools is part of the SRD, even for 
+the same monster.  This makes it difficult to use 5eTools to generate monsters without crossing data theft / piracy lines.
+
+Why do you care?  See the User Manual for more information, but it boils down to this:  Projects like 5eTools can exist
+for all of us because there is a benefit to WotC for those projects existing...for those of us who have paid for data from
+WotC or other sources having projects like 5eTools available for use in things like VTTs like MapTool or Foundry allow 
+for 5e to be a dominant TTRPG system.  However, that benefit is offset by a bit when someone decides to use the data WITHOUT
+paying for it.  The more people who do this, the more the Cost / Benefit analysis of allowing projects like 5eTools to exist
+weighs in the favor stomping on access to data like this.  
+
+For a VARIETY of reasons, it is VERY important for projects like 5eTools to exist.  Imagine, a second, a world where D&D 
+Beyond decides to put out it's own VTT.  Because it has access to all of the 5e Data and people who pay for that data from 
+them have access to it, if D&D Beyond decides to roll out it's own VTT, how would free tools like MapTool or non-mega producers 
+like Foundry VTT continue to exist in worlds like this.  Continue down this route where each of the major TTRPG systems have a 
+D&D Beyond like website and produce a VTT using that data.  Don't believe that's possible?  Look at all the streaming services
+now...NetFlix, Hulu, Disney+, Amazon, HBO, the list goes on and on.  Everyone wants their cut of your money to see the one
+show you care about.  In the streaming world, "Maptool" can't exist because all of the "data" is owned by the content
+distributor.
+
+Lets help keep this from happening in the VTT world.  Projects like 5eTools are massively important, so lets keep these
+projects available by keeping the ROI for WotC on the side of allowing these projects to exist.

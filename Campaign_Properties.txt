@@ -1,0 +1,86 @@
+* Create a new Campaign Properties -> Token Properties Token Type called "MonsterBlock".
+* Add the "Monster Block" properties to the MonsterBlock Token Type.
+* Create a new Campaign Properties -> Token Properties Token Type called "LibMonsterCreator".
+* Add the "LibMonsterCreator" properties to the LibMonsterCreator Token Type.
+
+=============================
+===     MONSTER BLOCK     ===
+=============================
+__BASEINFO__
+*name (Name)
+*type (Type)
+size (Size)
+alignment (Alignment)
+*elevation (Elevation)
+*#AC
+HP
+MaxHP
+TempHP
+TempMaxHP
+eMaxHP:{MaxHP + TempMaxHP}
+eHP:{HP + TempHP}
+*#DisplayHP (HP):{eHP}/{eMaxHP} [r, if(TempHP>0):" (+" + TempHP + ")"]
+HD
+*#CR
+__MOVE__
+walk
+climb
+swim
+fly
+*Movement:Walk: {walk}; Climb: {climb}; Swim: {swim}; Fly: {fly}
+__STATS__
+*#Strength (STR)
+*#Dexterity (DEX)
+*#Constitution (CON)
+*#Intelligence (INT)
+*#Wisdom (WIS)
+*#Charisma (CHA)
+__SENSES__
+sDV
+sBS
+sTS
+*Sight:Darkvision:{sDV}; Blindsight: {sBS}; Truesight: {sTS}
+*PP (Passive Perception)
+__MODIFIERS__
+StrMod:[r: floor(Strength / 2 - 5)]
+DexMod:[r: floor(Dexterity / 2 - 5)]
+ConMod:[r: floor(Constitution / 2 - 5)]
+IntMod:[r: floor(Intelligence / 2 - 5)]
+WisMod:[r: floor(Wisdom / 2 - 5)]
+ChaMod:[r: floor(Charisma / 2 - 5)]
+__SAVES__
+StrSave
+DexSave
+ConSave
+IntSave
+WisSave
+ChaSave
+__SKILLS__
+*#Proficiencies
+*#Initiative:{DexMod + InitiativeBonus}
+InitiativeBonus:0
+__VULNERABILITIES RESISTANCES and IMMUNITIES__
+*#vuln (Vulnerabilities)
+*#res (Resistances)
+*#imm (Immunities)
+*#cimm (Condition Immunities)
+__PROCESSING__
+jsonblock
+addjsonblock
+dataFromSource
+statSheetSpecAb
+statSheetAction
+statSheetLEAction
+rechargeAbilities
+
+=============================
+===   LIBMONSTERCREATOR   ===
+=============================
+p5aURL
+p5tURL
+pAbilityList
+pStatList
+pBasicMobMap
+pDefaultSource
+pCriticalFormula
+libversion
